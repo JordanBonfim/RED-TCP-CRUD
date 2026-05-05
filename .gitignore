@@ -44,7 +44,8 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-**/out/
+kotlin-tcp-crud-server/src/main/proto/out/*
+# kotlin-tcp-crud-server/src/main/proto/out/
 
 python-tcp-crud-client/protoc/*.py
 python-tcp-crud-client/protoc/__pycache__/
