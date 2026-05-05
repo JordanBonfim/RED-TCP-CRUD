@@ -46,4 +46,6 @@ bin/
 
 **/out/
 
+python-tcp-crud-client/protoc/*.py
+python-tcp-crud-client/protoc/__pycache__/
 .env
