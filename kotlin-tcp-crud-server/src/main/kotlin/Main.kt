@@ -1,53 +1,62 @@
-package bonfim.jordan
+package com.exemplo.catalog
 
-
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.PrintWriter
-import java.net.ServerSocket
-import kotlin.concurrent.thread
+import MovieService
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import io.github.cdimascio.dotenv.dotenv
+import io.grpc.ServerBuilder
 
 fun main() {
-    val SERVER_PORT = 8080
-    val server = ServerSocket(SERVER_PORT)
+    println("Servidor iniciando...")
 
-    println("Servidor TCP online na porta $SERVER_PORT.")
-    println("Aguardando conexões de entrada")
+    val dotenv = dotenv()
 
-    while (true) {
-        // Bloqueia até que um cliente estabeleça conexão
-        val clientSocket = server.accept()
-        println("Nova conexão estabelecida: ${clientSocket.inetAddress.hostAddress}")
+    val dbPassword = dotenv["DB_PASSWORD"]
 
-        // Inicia uma thread dedicada para não bloquear o loop principal
-        thread {
-            try {
-                val input = BufferedReader(InputStreamReader(clientSocket.inputStream))
-                val output = PrintWriter(clientSocket.outputStream, true)
-
-                // Mensagem de boas-vindas ao cliente
-                output.println("Conexão estabelecida")
-
-                var message: String?
-                // Lê as mensagens do cliente continuamente
-                while (input.readLine().also { message = it } != null) {
-                    println("[CLIENTE ${clientSocket.inetAddress.hostAddress}] $message")
-
-
-                    if (message?.trim( )?.lowercase() == "exit") {
-                        output.println("Encerrando conexão")
-                        break
-                    } else {
-                        output.println("Servidor recebeu: $message")
-                    }
-                }
-            } catch (e: Exception) {
-                println("[ERRO] Falha na comunicação com o cliente: ${e.message}")
-            } finally {
-                // liberar recursos
-                clientSocket.close()
-                println("Conexão encerrada")
-            }
-        }
+    if (dbPassword == null) {
+        println("ERRO: Variável DB_PASSWORD não encontrada no .env")
+        return
     }
+
+
+
+
+
+
+    println(dbPassword)
+    // Conexao com o MongoDB Atlas
+    val uri = "mongodb+srv://jordanbonfim_db_user:$dbPassword@cluster0.sh7okth.mongodb.net/?appName=Cluster0"
+
+    val databaseName = "sample_mflix"
+
+    val mongoClient = MongoClient.create(uri)
+    val database = mongoClient.getDatabase(databaseName)
+
+    println("Conectado ao banco de dados")
+
+    // Inicializacao dos componentes
+    val repository = MovieRepository(database)
+    val movieService = MovieService(repository)
+
+    // Configuracao e inicializacao do Servidor gRPC (TCP)
+    val port = 5090
+    val server = ServerBuilder.forPort(port)
+        .addService(movieService)
+        .build()
+
+    server.start()
+    println("Servidor gRPC TCP operando na porta $port. Aguardando instrucoes...")
+
+
+
+
+
+    Runtime.getRuntime().addShutdownHook(Thread {
+        println("Encerrando")
+        server.shutdown()
+        mongoClient.close()
+        println("Sistemas desligados com sucesso.")
+    })
+
+
+    server.awaitTermination()
 }

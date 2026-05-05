@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+//
+message Movie {
+  string id = 1;
+  string plot = 2;
+  repeated string genres = 3;
+  int32 runtime = 4;
+  repeated string cast = 5;
+  int32 num_mflix_comments = 6;
+  string poster = 7;
+  string title = 8;
+  string fullplot = 9;
+  repeated string languages = 10;
+  google.protobuf.Timestamp released = 11;
+  repeated string directors = 12;
+  repeated string writers = 13;
+  string lastupdated = 14;
+  int32 year = 15;
+  repeated string countries = 16;
+  string type = 17;
+}
+
+// MENSAGENS DE REQUEST/RESPONSE PARA CRUD
+message CreateMovieRequest {
+  Movie movie = 1;
+}
+
+message ReadMovieRequest {
+  string id = 1;
+}
+
+message UpdateMovieRequest {
+  string id = 1;
+  Movie movie = 2;
+}
+
+message DeleteMovieRequest {
+  string id = 1;
+}
+
+// MENSAGENS DE REQUEST PARA LISTAGENS
+
+message ListByActorRequest {
+  string actor_name = 1;
+}
+
+message ListByCategoryRequest {
+  string category = 1; // Corresponde ao array 'genres'
+}
+
+message MovieListResponse {
+  repeated Movie movies = 1;
+}
+
+// DEFINIÇÃO DO SERVIÇO
+
+service MovieService {
+  // CRUD Básico
+  rpc CreateMovie (CreateMovieRequest) returns (Movie);
+  rpc ReadMovie (ReadMovieRequest) returns (Movie);
+  rpc UpdateMovie (UpdateMovieRequest) returns (Movie);
+  rpc DeleteMovie (DeleteMovieRequest) returns (google.protobuf.Empty);
+
+  rpc ListMoviesByActor (ListByActorRequest) returns (MovieListResponse);
+  rpc ListMoviesByCategory (ListByCategoryRequest) returns (MovieListResponse);
+}
