@@ -1,6 +1,3 @@
-package com.exemplo.catalog
-
-import MovieService
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import io.github.cdimascio.dotenv.dotenv
 import io.grpc.ServerBuilder
@@ -11,20 +8,15 @@ fun main() {
     val dotenv = dotenv()
 
     val dbPassword = dotenv["DB_PASSWORD"]
+    val dbUser = dotenv["DB_USER"]
 
-    if (dbPassword == null) {
-        println("ERRO: Variável DB_PASSWORD não encontrada no .env")
+    if (dbPassword == null || dbUser == null) {
+        println("ERRO: Variáveis necessárias não encontradas no .env")
         return
     }
 
-
-
-
-
-
-    println(dbPassword)
     // Conexao com o MongoDB Atlas
-    val uri = "mongodb+srv://jordanbonfim_db_user:$dbPassword@cluster0.sh7okth.mongodb.net/?appName=Cluster0"
+    val uri = "mongodb+srv://$dbUser:$dbPassword@cluster0.sh7okth.mongodb.net/?appName=Cluster0"
 
     val databaseName = "sample_mflix"
 
@@ -45,10 +37,6 @@ fun main() {
 
     server.start()
     println("Servidor gRPC TCP operando na porta $port. Aguardando instrucoes...")
-
-
-
-
 
     Runtime.getRuntime().addShutdownHook(Thread {
         println("Encerrando")

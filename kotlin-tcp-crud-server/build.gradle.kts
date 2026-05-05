@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm") version "2.3.20"
-    // Plugin oficial do Protobuf adicionado
     id("com.google.protobuf") version "0.9.4"
 }
 
@@ -26,8 +25,8 @@ dependencies {
     implementation("io.grpc:grpc-protobuf:1.62.2")
     implementation("io.grpc:grpc-stub:1.62.2")
     implementation("io.grpc:grpc-kotlin-stub:1.4.1")
-    implementation("com.google.protobuf:protobuf-kotlin:3.25.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("com.google.protobuf:protobuf-kotlin:3.25.3")
 }
 
 kotlin {
