@@ -18,13 +18,13 @@ class MovieRepository(database: MongoDatabase) {
     //  MÉTODOS DE BUSCA ESPECÍFICOS
     suspend fun findMoviesByActor(actorName: String): List<Movie> {
         // Busca documentos onde o array 'cast' contém o nome do ator
-        val results = collection.find(`in`("cast", actorName)).toList()
+        val results = collection.find(`in`("cast", actorName)).limit(40).toList()
         return results.map { it.toProtoMovie() }
     }
 
     suspend fun findMoviesByCategory(category: String): List<Movie> {
         // Busca documentos onde o array 'genres' contém a categoria
-        val results = collection.find(`in`("genres", category)).toList()
+        val results = collection.find(`in`("genres", category)).limit(40).toList()
         return results.map { it.toProtoMovie() }
     }
 
@@ -33,7 +33,6 @@ class MovieRepository(database: MongoDatabase) {
     suspend fun getMovieById(id: String): Movie? {
         println("Movie ID: $id")
         val document = collection.find(eq("_id", ObjectId(id))).firstOrNull()
-        println(document)
         return document?.toProtoMovie()
     }
 
