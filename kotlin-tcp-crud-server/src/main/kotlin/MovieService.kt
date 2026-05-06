@@ -8,7 +8,7 @@ import bonfim.jordan.catalog.Movie
 import bonfim.jordan.catalog.MovieListResponse
 import bonfim.jordan.catalog.MovieServiceGrpcKt
 import bonfim.jordan.catalog.UpdateMovieRequest
-import com.google.protobuf.Empty
+import java.time.Instant
 
 class MovieService(private val repository: MovieRepository) : MovieServiceGrpcKt.MovieServiceCoroutineImplBase() {
 
@@ -23,16 +23,22 @@ class MovieService(private val repository: MovieRepository) : MovieServiceGrpcKt
         val movie = repository.getMovieById(request.id)
         return movie ?: Movie.getDefaultInstance()
     }
-
     override suspend fun updateMovie(request: UpdateMovieRequest): Movie {
-        println("Requisicao recebida: Atualizar filme ID '${request.id}'")
-        val updatedMovie = repository.updateMovie(request.id, request.movie)
+        val tempoAtual = Instant.now().toString()
+        val filmeComTempoAtualizado = request.movie.toBuilder()
+            .setLastupdated(tempoAtual)
+            .build()
+        val updatedMovie = repository.updateMovie(request.id, filmeComTempoAtualizado)
+
+
         return updatedMovie ?: Movie.getDefaultInstance()
     }
 
+
+
     override suspend fun deleteMovie(request: DeleteMovieRequest): com.google.protobuf.Empty {
         println("Requisicao recebida: deletar filme ID '${request.id}'")
-        val wasDeleted = repository.deleteMovie(request.id)
+        repository.deleteMovie(request.id)
         return com.google.protobuf.Empty.getDefaultInstance()
     }
 

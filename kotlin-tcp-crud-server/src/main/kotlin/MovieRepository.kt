@@ -71,6 +71,7 @@ class MovieRepository(database: MongoDatabase) {
             if (movie.poster.isNotEmpty()) updates.append("poster", movie.poster)
             if (movie.type.isNotEmpty()) updates.append("type", movie.type)
             if (movie.runtime != 0) updates.append("runtime", movie.runtime)
+            if (movie.lastupdated.isNotEmpty()) updates.append("lastupdated", movie.lastupdated)
 
 
             if (movie.genresList.isNotEmpty()) updates.append("genres", movie.genresList)
