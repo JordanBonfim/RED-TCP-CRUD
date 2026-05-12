@@ -4,10 +4,10 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
-option java_package = "bonfim.jordan.catalog"; // Baseado no group do seu build.gradle.kts
+option java_package = "bonfim.jordan.catalog";
 option java_outer_classname = "CatalogProto";
 
-//
+// A Entidade Principal
 message Movie {
   string id = 1;
   string plot = 2;
@@ -28,13 +28,16 @@ message Movie {
   string type = 17;
 }
 
-// MENSAGENS DE REQUEST/RESPONSE PARA CRUD
+// AS CARGAS ÚTEIS (PAYLOADS)
 message CreateMovieRequest {
   Movie movie = 1;
 }
 
 message GetMovieRequest {
-  string id = 1;
+  oneof search_param {
+    string id = 1;
+    string title = 2;
+  }
 }
 
 message UpdateMovieRequest {
@@ -46,29 +49,38 @@ message DeleteMovieRequest {
   string id = 1;
 }
 
-// MENSAGENS DE REQUEST PARA LISTAGENS
-
 message ListByActorRequest {
   string actor_name = 1;
 }
 
 message ListByCategoryRequest {
-  string category = 1; // Corresponde ao array 'genres'
+  string category = 1;
 }
 
 message MovieListResponse {
   repeated Movie movies = 1;
 }
 
-// DEFINIÇÃO DO SERVIÇO
 
-service MovieService {
-  // CRUD Básico
-  rpc CreateMovie (CreateMovieRequest) returns (Movie);
-  rpc GetMovie (GetMovieRequest) returns (Movie);
-  rpc UpdateMovie (UpdateMovieRequest) returns (Movie);
-  rpc DeleteMovie (DeleteMovieRequest) returns (google.protobuf.Empty);
+// requisição do cliente
+message TcpRequest {
 
-  rpc ListMoviesByActor (ListByActorRequest) returns (MovieListResponse);
-  rpc ListMoviesByCategory (ListByCategoryRequest) returns (MovieListResponse);
+  oneof operation {
+    CreateMovieRequest create = 1;
+    GetMovieRequest get = 2;
+    UpdateMovieRequest update = 3;
+    DeleteMovieRequest delete = 4;
+    ListByActorRequest list_actor = 5;
+    ListByCategoryRequest list_category = 6;
+  }
+}
+
+// resposta do server
+message TcpResponse {
+  oneof result {
+    Movie movie = 1;
+    MovieListResponse list = 2;
+    google.protobuf.Empty empty = 3;
+    string error_message = 4;
+  }
 }
